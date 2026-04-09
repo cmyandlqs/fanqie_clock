@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from PySide6.QtCore import QPoint, Qt, Signal
-from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent
+from PySide6.QtGui import QColor, QLinearGradient, QMouseEvent, QPainter, QPaintEvent
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -65,8 +65,9 @@ class MainWindow(QWidget):
         title_bar = QFrame()
         title_bar.setObjectName("TitleBar")
         title_layout = QHBoxLayout(title_bar)
-        title_layout.setContentsMargins(0, 0, 0, 6)
+        title_layout.setContentsMargins(0, 0, 0, 4)
         title_layout.setSpacing(12)
+        title_layout.setAlignment(Qt.AlignVCenter)
 
         title_label = QLabel("番茄钟")
         title_label.setObjectName("TitleLabel")
@@ -78,23 +79,52 @@ class MainWindow(QWidget):
         title_stack.addWidget(title_label)
         title_stack.addWidget(subtitle)
 
+        traffic_lights = QHBoxLayout()
+        traffic_lights.setSpacing(6)
+        traffic_lights.setContentsMargins(0, 0, 0, 0)
+        traffic_lights.setAlignment(Qt.AlignVCenter)
+        for color in ("#ff5f57", "#febc2e", "#28c840"):
+            light = QLabel()
+            light.setFixedSize(10, 10)
+            light.setStyleSheet(
+                f"background:{color}; border-radius:5px; border:1px solid rgba(0,0,0,0.08);"
+            )
+            traffic_lights.addWidget(light)
+
+        left_cluster = QVBoxLayout()
+        left_cluster.setContentsMargins(0, 0, 0, 0)
+        left_cluster.setSpacing(6)
+        left_cluster.setAlignment(Qt.AlignVCenter)
+        left_cluster.addLayout(traffic_lights)
+        left_cluster.addLayout(title_stack)
+
         close_button = QToolButton()
         close_button.setObjectName("TitleButton")
         close_button.setText("收起")
+        close_button.setFixedHeight(30)
         close_button.clicked.connect(self.close_requested.emit)
 
-        title_layout.addLayout(title_stack)
+        title_layout.addLayout(left_cluster, 0)
         title_layout.addStretch()
-        title_layout.addWidget(close_button)
+        title_layout.addWidget(close_button, 0, Qt.AlignVCenter)
 
         card_layout.addWidget(title_bar)
 
         self._status_label.setAlignment(Qt.AlignCenter)
         self._time_label.setAlignment(Qt.AlignCenter)
         self._cycle_label.setAlignment(Qt.AlignCenter)
-        self._status_label.setStyleSheet("font-size: 18px; font-weight: 700; color: #9a3412;")
-        self._time_label.setStyleSheet("font-size: 58px; font-weight: 800; color: #7c2d12; letter-spacing: 1px;")
-        self._cycle_label.setStyleSheet("font-size: 14px; color: #9c6b4f;")
+        self._status_label.setStyleSheet(
+            "font-size: 14px; font-weight: 700; color: #9a3412; "
+            "background: rgba(255,255,255,0.66); border:1px solid rgba(194,65,12,0.10); "
+            "border-radius: 12px; padding: 6px 14px;"
+        )
+        self._time_label.setStyleSheet(
+            "font-size: 58px; font-weight: 800; color: #7c2d12; letter-spacing: 1px;"
+        )
+        self._cycle_label.setStyleSheet(
+            "font-size: 13px; color: #9c6b4f; background: rgba(255,248,241,0.88); "
+            "border-radius: 10px; padding: 4px 10px;"
+        )
 
         card_layout.addWidget(self._status_label)
         card_layout.addWidget(self._time_label)
@@ -146,9 +176,11 @@ class MainWindow(QWidget):
     def _build_duration_row(self, label_text: str, spin_box: StepperInput) -> QWidget:
         row = QFrame()
         row.setObjectName("SettingRow")
+        row.setMinimumHeight(40)
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
+        layout.setAlignment(Qt.AlignVCenter)
 
         label = QLabel(label_text)
         label.setObjectName("SettingLabel")
@@ -157,18 +189,20 @@ class MainWindow(QWidget):
         minute_label = QLabel("分钟")
         minute_label.setObjectName("MinuteLabel")
 
-        layout.addWidget(label)
+        layout.addWidget(label, 0, Qt.AlignVCenter)
         layout.addStretch(1)
         layout.addWidget(spin_box, 0, Qt.AlignVCenter)
-        layout.addWidget(minute_label)
+        layout.addWidget(minute_label, 0, Qt.AlignVCenter)
         return row
 
     def _build_toggle_row(self, label_text: str, toggle: ToggleSwitch) -> QWidget:
         row = QFrame()
         row.setObjectName("SettingRow")
+        row.setMinimumHeight(42)
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
+        layout.setAlignment(Qt.AlignVCenter)
 
         label = QLabel(label_text)
         label.setObjectName("SettingLabel")
@@ -176,7 +210,7 @@ class MainWindow(QWidget):
 
         toggle.setText("")
 
-        layout.addWidget(label)
+        layout.addWidget(label, 0, Qt.AlignVCenter)
         layout.addStretch(1)
         layout.addWidget(toggle, 0, Qt.AlignVCenter)
         return row
@@ -241,6 +275,13 @@ class MainWindow(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor(0, 0, 0, 24))
-        painter.drawRoundedRect(self.rect().adjusted(8, 8, -8, -4), 30, 30)
+        painter.setBrush(QColor(0, 0, 0, 18))
+        painter.drawRoundedRect(self.rect().adjusted(8, 10, -8, -2), 30, 30)
+
+        glow = QLinearGradient(0, 0, self.width(), self.height())
+        glow.setColorAt(0.0, QColor(255, 255, 255, 90))
+        glow.setColorAt(0.25, QColor(255, 248, 242, 35))
+        glow.setColorAt(1.0, QColor(255, 255, 255, 0))
+        painter.setBrush(glow)
+        painter.drawRoundedRect(self.rect().adjusted(4, 4, -4, -8), 32, 32)
         super().paintEvent(event)

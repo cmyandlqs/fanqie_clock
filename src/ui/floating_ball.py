@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, Qt, Signal
-from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent
+from PySide6.QtGui import QColor, QLinearGradient, QMouseEvent, QPainter, QPaintEvent, QRadialGradient
 from PySide6.QtWidgets import QWidget
 
 from src.core.state import DisplaySnapshot, StateSnapshot, TimerState
@@ -89,12 +89,35 @@ class FloatingBall(QWidget):
         elif self._state == TimerState.PAUSED:
             color = QColor("#475467")
 
+        outer_rect = self.rect().adjusted(2, 2, -2, -6)
+        shadow_rect = self.rect().adjusted(4, 8, -4, -1)
+
         painter.setBrush(QColor(15, 23, 42, 32))
         painter.setPen(Qt.NoPen)
-        painter.drawEllipse(self.rect().adjusted(4, 6, -4, -2))
-        painter.setBrush(color)
+        painter.drawEllipse(shadow_rect)
+
+        body_gradient = QLinearGradient(0, outer_rect.top(), 0, outer_rect.bottom())
+        body_gradient.setColorAt(0.0, color.lighter(128))
+        body_gradient.setColorAt(0.55, color)
+        body_gradient.setColorAt(1.0, color.darker(112))
+        painter.setBrush(body_gradient)
         painter.setPen(Qt.NoPen)
-        painter.drawEllipse(self.rect().adjusted(2, 2, -2, -6))
+        painter.drawEllipse(outer_rect)
+
+        ring_gradient = QLinearGradient(outer_rect.left(), outer_rect.top(), outer_rect.right(), outer_rect.bottom())
+        ring_gradient.setColorAt(0.0, QColor(255, 255, 255, 95))
+        ring_gradient.setColorAt(1.0, QColor(255, 255, 255, 12))
+        painter.setBrush(Qt.NoBrush)
+        painter.setPen(QColor(255, 255, 255, 55))
+        painter.drawEllipse(outer_rect.adjusted(1, 1, -1, -1))
+
+        highlight = QRadialGradient(outer_rect.center().x() - 16, outer_rect.top() + 18, 34)
+        highlight.setColorAt(0.0, QColor(255, 255, 255, 120))
+        highlight.setColorAt(0.7, QColor(255, 255, 255, 20))
+        highlight.setColorAt(1.0, QColor(255, 255, 255, 0))
+        painter.setBrush(highlight)
+        painter.setPen(Qt.NoPen)
+        painter.drawEllipse(outer_rect.adjusted(8, 6, -18, -30))
 
         painter.setPen(QColor("#f8fafc"))
         font = painter.font()
@@ -102,12 +125,12 @@ class FloatingBall(QWidget):
         font.setBold(True)
         painter.setFont(font)
         painter.drawText(
-            self.rect().adjusted(0, 6, 0, -12), Qt.AlignCenter, self._time_text
+            outer_rect.adjusted(0, 8, 0, -14), Qt.AlignCenter, self._time_text
         )
 
         font.setPointSize(8)
         font.setBold(False)
         painter.setFont(font)
         painter.drawText(
-            self.rect().adjusted(0, 40, 0, -4), Qt.AlignCenter, self._status
+            outer_rect.adjusted(0, 42, 0, -2), Qt.AlignCenter, self._status
         )

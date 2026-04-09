@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPaintEvent, QRadialGradient
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from src.core.state import DisplaySnapshot, StateSnapshot, TimerState
@@ -20,17 +21,22 @@ class BreakOverlay(QWidget):
         self.setStyleSheet(
             """
             QWidget {
+                background: transparent;
+                border: none;
+            }
+            QFrame#BreakCard {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                     stop:0 rgba(28, 25, 23, 238),
                     stop:0.55 rgba(68, 64, 60, 232),
                     stop:1 rgba(124, 45, 18, 228));
+                border-radius: 28px;
+                border: none;
+            }
+            QLabel {
+                background: transparent;
+                border: none;
                 color: white;
                 font-family: "Segoe UI";
-            }
-            QFrame {
-                background: rgba(255, 248, 240, 0.10);
-                border-radius: 28px;
-                border: 1px solid rgba(255, 237, 213, 0.22);
             }
             QPushButton {
                 background: rgba(255, 247, 237, 0.96);
@@ -47,6 +53,7 @@ class BreakOverlay(QWidget):
         layout.setAlignment(Qt.AlignCenter)
 
         card = QFrame()
+        card.setObjectName("BreakCard")
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(36, 36, 36, 36)
         card_layout.setSpacing(18)
@@ -80,6 +87,41 @@ class BreakOverlay(QWidget):
         card_layout.addWidget(hint_label)
         card_layout.addLayout(actions)
         layout.addWidget(card)
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+
+        base = QLinearGradient(0, 0, self.width(), self.height())
+        base.setColorAt(0.0, QColor(255, 250, 245, 58))
+        base.setColorAt(0.35, QColor(241, 245, 249, 52))
+        base.setColorAt(0.7, QColor(255, 237, 213, 48))
+        base.setColorAt(1.0, QColor(28, 25, 23, 68))
+        painter.setBrush(base)
+        painter.drawRect(self.rect())
+
+        glow_left = QRadialGradient(self.width() * 0.18, self.height() * 0.22, self.width() * 0.35)
+        glow_left.setColorAt(0.0, QColor(255, 255, 255, 34))
+        glow_left.setColorAt(0.55, QColor(255, 247, 237, 18))
+        glow_left.setColorAt(1.0, QColor(255, 255, 255, 0))
+        painter.setBrush(glow_left)
+        painter.drawEllipse(int(self.width() * -0.05), int(self.height() * -0.02), int(self.width() * 0.55), int(self.height() * 0.42))
+
+        glow_right = QRadialGradient(self.width() * 0.84, self.height() * 0.78, self.width() * 0.34)
+        glow_right.setColorAt(0.0, QColor(251, 146, 60, 28))
+        glow_right.setColorAt(0.55, QColor(194, 65, 12, 16))
+        glow_right.setColorAt(1.0, QColor(251, 146, 60, 0))
+        painter.setBrush(glow_right)
+        painter.drawEllipse(int(self.width() * 0.56), int(self.height() * 0.56), int(self.width() * 0.42), int(self.height() * 0.34))
+
+        frost = QLinearGradient(0, 0, 0, self.height())
+        frost.setColorAt(0.0, QColor(255, 255, 255, 10))
+        frost.setColorAt(1.0, QColor(255, 255, 255, 2))
+        painter.setBrush(frost)
+        painter.drawRect(self.rect())
+
+        super().paintEvent(event)
 
     def update_title(self, title: str) -> None:
         self._title_label.setText(title)

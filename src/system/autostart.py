@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 
@@ -20,9 +21,13 @@ class AutoStartManager:
 
     def enable(self) -> None:
         try:
-            target = Path(__file__).resolve().parents[2] / "src" / "main.py"
-            python_exe = Path(os.sys.executable)
-            command = f'@echo off\r\n"{python_exe}" "{target}"\r\n'
+            if getattr(sys, "frozen", False):
+                executable = Path(sys.executable)
+                command = f'@echo off\r\n"{executable}"\r\n'
+            else:
+                target = Path(__file__).resolve().parents[2] / "src" / "main.py"
+                python_exe = Path(os.sys.executable)
+                command = f'@echo off\r\n"{python_exe}" "{target}"\r\n'
             self._shortcut_path.write_text(command, encoding="utf-8")
         except OSError:
             return
