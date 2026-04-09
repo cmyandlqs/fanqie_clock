@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-project_root = Path.cwd()
+project_root = Path(SPEC).resolve().parent
 
 datas = [
     (str(project_root / "assets" / "tomato.svg"), "assets"),
@@ -34,7 +34,6 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
-    icon=str(project_root / "assets" / "tomato.svg"),
 )
 
 coll = COLLECT(
