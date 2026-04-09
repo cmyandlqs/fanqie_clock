@@ -9,7 +9,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QSpinBox,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -18,6 +17,7 @@ from PySide6.QtWidgets import (
 from src.core.state import DisplaySnapshot, StateSnapshot
 from src.system.config import AppConfig
 from src.system.icons import app_icon
+from src.ui.stepper_input import StepperInput
 from src.ui.styles import APP_STYLESHEET
 from src.ui.toggle_switch import ToggleSwitch
 
@@ -43,9 +43,9 @@ class MainWindow(QWidget):
         self._time_label = QLabel("25:00")
         self._cycle_label = QLabel("第 1 轮 / 共 4 轮")
 
-        self._focus_spin = QSpinBox()
-        self._short_break_spin = QSpinBox()
-        self._long_break_spin = QSpinBox()
+        self._focus_spin = StepperInput()
+        self._short_break_spin = StepperInput()
+        self._long_break_spin = StepperInput()
         self._startup_checkbox = ToggleSwitch("开机自动启动")
         self._topmost_checkbox = ToggleSwitch("悬浮球始终置顶")
 
@@ -119,26 +119,20 @@ class MainWindow(QWidget):
         settings_panel.setObjectName("SettingsPanel")
         settings_layout = QVBoxLayout(settings_panel)
         settings_layout.setContentsMargins(20, 20, 20, 20)
-        settings_layout.setSpacing(16)
-
-        panel_title = QLabel("设置")
-        panel_title.setStyleSheet("font-size: 16px; font-weight: 700; color: #7c2d12; min-height: 24px;")
-        settings_layout.addWidget(panel_title)
+        settings_layout.setSpacing(18)
 
         settings_layout.addWidget(self._build_duration_row("专注时长", self._focus_spin))
         settings_layout.addWidget(self._build_duration_row("短休息", self._short_break_spin))
         settings_layout.addWidget(self._build_duration_row("长休息", self._long_break_spin))
 
         for spin in (self._focus_spin, self._short_break_spin, self._long_break_spin):
-            spin.setRange(1, 120)
-            spin.setButtonSymbols(QSpinBox.NoButtons)
             spin.valueChanged.connect(self._emit_config_change)
 
         self._startup_checkbox.stateChanged.connect(self._emit_config_change)
         self._topmost_checkbox.stateChanged.connect(self._emit_config_change)
 
-        settings_layout.addWidget(self._startup_checkbox)
-        settings_layout.addWidget(self._topmost_checkbox)
+        settings_layout.addWidget(self._build_toggle_row("开机自动启动", self._startup_checkbox))
+        settings_layout.addWidget(self._build_toggle_row("悬浮球始终置顶", self._topmost_checkbox))
 
         footer = QLabel("by sikm")
         footer.setObjectName("FooterLabel")
@@ -149,38 +143,42 @@ class MainWindow(QWidget):
 
         root.addWidget(card)
 
-    def _build_duration_row(self, label_text: str, spin_box: QSpinBox) -> QWidget:
+    def _build_duration_row(self, label_text: str, spin_box: StepperInput) -> QWidget:
         row = QFrame()
         row.setObjectName("SettingRow")
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(12)
 
         label = QLabel(label_text)
         label.setObjectName("SettingLabel")
-        label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        label.setFixedWidth(92)
-
-        minus_button = QToolButton()
-        minus_button.setObjectName("SpinButton")
-        minus_button.setText("-")
-        minus_button.clicked.connect(lambda: spin_box.setValue(spin_box.value() - 1))
-
-        plus_button = QToolButton()
-        plus_button.setObjectName("SpinButton")
-        plus_button.setText("+")
-        plus_button.clicked.connect(lambda: spin_box.setValue(spin_box.value() + 1))
+        label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         minute_label = QLabel("分钟")
         minute_label.setObjectName("MinuteLabel")
 
         layout.addWidget(label)
-        layout.addWidget(minus_button)
-        layout.addWidget(spin_box)
-        layout.addWidget(plus_button)
-        layout.addWidget(minute_label)
-        layout.addSpacing(6)
         layout.addStretch(1)
+        layout.addWidget(spin_box, 0, Qt.AlignVCenter)
+        layout.addWidget(minute_label)
+        return row
+
+    def _build_toggle_row(self, label_text: str, toggle: ToggleSwitch) -> QWidget:
+        row = QFrame()
+        row.setObjectName("SettingRow")
+        layout = QHBoxLayout(row)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(12)
+
+        label = QLabel(label_text)
+        label.setObjectName("SettingLabel")
+        label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        toggle.setText("")
+
+        layout.addWidget(label)
+        layout.addStretch(1)
+        layout.addWidget(toggle, 0, Qt.AlignVCenter)
         return row
 
     def _apply_config(self) -> None:

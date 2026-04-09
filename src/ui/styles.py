@@ -21,6 +21,12 @@ QFrame#SettingRow {
     background: transparent;
 }
 
+QFrame#StepperFrame {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #f3d2bc;
+    border-radius: 8px;
+}
+
 QFrame#TitleBar {
     background: transparent;
 }
@@ -81,36 +87,35 @@ QPushButton[variant="secondary"]:pressed {
     background: #fdba74;
 }
 
-QToolButton#SpinButton {
-    background: rgba(194, 65, 12, 0.08);
+QToolButton#StepperButton {
+    background: transparent;
     color: #9a3412;
     border: none;
-    border-radius: 7px;
-    min-width: 26px;
-    max-width: 26px;
-    min-height: 26px;
-    max-height: 26px;
+    border-radius: 6px;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
     font-size: 16px;
     font-weight: 700;
 }
 
-QToolButton#SpinButton:hover {
-    background: rgba(194, 65, 12, 0.16);
+QToolButton#StepperButton:hover {
+    background: rgba(194, 65, 12, 0.10);
 }
 
-QToolButton#SpinButton:pressed {
-    background: rgba(194, 65, 12, 0.24);
+QToolButton#StepperButton:pressed {
+    background: rgba(194, 65, 12, 0.18);
 }
 
 QSpinBox {
-    padding: 0 6px;
-    min-height: 32px;
-    max-height: 32px;
-    min-width: 58px;
-    max-width: 58px;
-    border-radius: 8px;
-    border: 1px solid #fed7aa;
-    background: rgba(255, 255, 255, 0.96);
+    padding: 0;
+    min-height: 24px;
+    max-height: 24px;
+    min-width: 34px;
+    max-width: 34px;
+    border: none;
+    background: transparent;
     font-size: 14px;
     font-weight: 600;
     color: #7c2d12;
