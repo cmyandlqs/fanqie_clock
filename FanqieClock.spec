@@ -6,6 +6,7 @@ project_root = Path(SPEC).resolve().parent
 
 datas = [
     (str(project_root / "assets" / "tomato.svg"), "assets"),
+    (str(project_root / "assets" / "tomato.ico"), "assets"),
 ]
 
 a = Analysis(
@@ -34,6 +35,7 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
+    icon=str(project_root / "assets" / "tomato.ico"),
 )
 
 coll = COLLECT(

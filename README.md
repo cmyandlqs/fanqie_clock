@@ -5,8 +5,6 @@ It focuses on a clean floating timer, a polished control window, and a strong fu
 
 ## Preview
 
-Add screenshots here:
-
 ![Main Window](imgs/主界面.jpg)
 ![Break Reminder](imgs/休息.jpg)
 
@@ -84,4 +82,4 @@ tests/       automated tests
 
 ## License
 
-Add your preferred license here.
+MIT

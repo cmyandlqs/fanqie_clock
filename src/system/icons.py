@@ -13,5 +13,8 @@ def resource_path(*parts: str) -> Path:
 
 
 def app_icon() -> QIcon:
-    icon_path = resource_path("assets", "tomato.svg")
-    return QIcon(str(icon_path))
+    ico_path = resource_path("assets", "tomato.ico")
+    if ico_path.exists():
+        return QIcon(str(ico_path))
+    svg_path = resource_path("assets", "tomato.svg")
+    return QIcon(str(svg_path))
