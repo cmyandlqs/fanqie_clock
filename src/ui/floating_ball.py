@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QWidget
 
 from src.core.state import DisplaySnapshot, StateSnapshot, TimerState
 from src.system.config import AppConfig
+from src.system.icons import app_icon
 
 
 class FloatingBall(QWidget):
@@ -17,12 +18,13 @@ class FloatingBall(QWidget):
         self._timer_engine = timer_engine
         self._config = config
         self._time_text = "25:00"
-        self._status = "Ready"
+        self._status = "待开始"
         self._drag_offset: QPoint | None = None
         self._press_pos: QPoint | None = None
         self._state = TimerState.IDLE
 
-        self.setWindowTitle("Fanqie Clock Ball")
+        self.setWindowTitle("番茄钟悬浮球")
+        self.setWindowIcon(app_icon())
         self.setFixedSize(88, 88)
         self.setWindowFlags(
             Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint
@@ -87,9 +89,12 @@ class FloatingBall(QWidget):
         elif self._state == TimerState.PAUSED:
             color = QColor("#475467")
 
+        painter.setBrush(QColor(15, 23, 42, 32))
+        painter.setPen(Qt.NoPen)
+        painter.drawEllipse(self.rect().adjusted(4, 6, -4, -2))
         painter.setBrush(color)
         painter.setPen(Qt.NoPen)
-        painter.drawEllipse(self.rect())
+        painter.drawEllipse(self.rect().adjusted(2, 2, -2, -6))
 
         painter.setPen(QColor("#f8fafc"))
         font = painter.font()

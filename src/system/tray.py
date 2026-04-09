@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QObject, Signal
-from PySide6.QtGui import QAction, QIcon
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
+
+from src.system.icons import app_icon
 
 
 class TrayController(QObject):
@@ -14,13 +16,13 @@ class TrayController(QObject):
         super().__init__()
         self._app = app
         self._timer_engine = timer_engine
-        self._tray = QSystemTrayIcon(QIcon(), self)
-        self._tray.setToolTip("Fanqie Clock")
+        self._tray = QSystemTrayIcon(app_icon(), self)
+        self._tray.setToolTip("番茄钟")
         self._menu = QMenu()
 
-        self._open_action = QAction("Open", self)
-        self._toggle_action = QAction("Start / Pause", self)
-        self._quit_action = QAction("Quit", self)
+        self._open_action = QAction("打开主界面", self)
+        self._toggle_action = QAction("开始 / 暂停", self)
+        self._quit_action = QAction("退出", self)
 
         self._menu.addAction(self._open_action)
         self._menu.addAction(self._toggle_action)
@@ -38,7 +40,7 @@ class TrayController(QObject):
 
     def show_break_notification(self, title: str, seconds: int) -> None:
         minutes = max(seconds // 60, 1)
-        self.show_message("Break reminder", f"{title} Duration: {minutes} minutes.")
+        self.show_message("休息提醒", f"{title}，时长约 {minutes} 分钟。")
 
     def show_message(self, title: str, message: str) -> None:
         self._tray.showMessage(title, message, QSystemTrayIcon.Information, 3000)

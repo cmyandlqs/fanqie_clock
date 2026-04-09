@@ -19,9 +19,27 @@ class BreakOverlay(QWidget):
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.setStyleSheet(
             """
-            QWidget { background: rgba(15, 23, 42, 0.88); color: white; font-family: "Segoe UI"; }
-            QFrame { background: rgba(255, 255, 255, 0.08); border-radius: 24px; }
-            QPushButton { background: white; color: #111827; border: none; border-radius: 14px; padding: 12px 18px; font-weight: 600; }
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 rgba(28, 25, 23, 238),
+                    stop:0.55 rgba(68, 64, 60, 232),
+                    stop:1 rgba(124, 45, 18, 228));
+                color: white;
+                font-family: "Segoe UI";
+            }
+            QFrame {
+                background: rgba(255, 248, 240, 0.10);
+                border-radius: 28px;
+                border: 1px solid rgba(255, 237, 213, 0.22);
+            }
+            QPushButton {
+                background: rgba(255, 247, 237, 0.96);
+                color: #7c2d12;
+                border: none;
+                border-radius: 14px;
+                padding: 12px 18px;
+                font-weight: 700;
+            }
             """
         )
 
@@ -35,19 +53,19 @@ class BreakOverlay(QWidget):
 
         self._title_label = QLabel(title)
         self._title_label.setAlignment(Qt.AlignCenter)
-        self._title_label.setStyleSheet("font-size: 34px; font-weight: 700;")
+        self._title_label.setStyleSheet("font-size: 38px; font-weight: 700; color: #fff7ed;")
         self._time_label = QLabel(self._format_seconds(seconds))
         self._time_label.setAlignment(Qt.AlignCenter)
-        self._time_label.setStyleSheet("font-size: 64px; font-weight: 800;")
-        hint_label = QLabel("Stand up, stretch, and look away from the screen.")
+        self._time_label.setStyleSheet("font-size: 72px; font-weight: 800; color: #ffedd5;")
+        hint_label = QLabel("站起来活动一下，看看远处，放松眼睛。")
         hint_label.setAlignment(Qt.AlignCenter)
-        hint_label.setStyleSheet("font-size: 16px; color: rgba(255,255,255,0.8);")
+        hint_label.setStyleSheet("font-size: 16px; color: rgba(255,247,237,0.88);")
 
         actions = QHBoxLayout()
-        skip_button = QPushButton("Skip")
-        snooze_button = QPushButton("Snooze 5 min")
-        close_button = QPushButton("Close reminder")
-        next_button = QPushButton("Start next focus")
+        skip_button = QPushButton("跳过休息")
+        snooze_button = QPushButton("延后 5 分钟")
+        close_button = QPushButton("关闭提醒")
+        next_button = QPushButton("开始下一轮")
         skip_button.clicked.connect(self.skip_requested.emit)
         snooze_button.clicked.connect(self.snooze_requested.emit)
         close_button.clicked.connect(self.close_requested.emit)
@@ -84,7 +102,7 @@ class FullscreenBreakController(QWidget):
         super().__init__()
         self._timer_engine = timer_engine
         self._overlays: list[BreakOverlay] = []
-        self._last_title = "Time to take a break."
+        self._last_title = "该休息一下了"
 
     def show_break_prompt(self, title: str, seconds: int) -> None:
         self._last_title = title

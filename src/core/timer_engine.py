@@ -58,7 +58,7 @@ class TimerEngine(QObject):
     def start_focus(self) -> None:
         self._start_state(TimerState.FOCUS, self._config.focus_minutes * 60)
         self.notification_requested.emit(
-            "Focus started", "Pomodoro focus session is running."
+            "开始专注", "当前已进入专注计时。"
         )
 
     def pause(self) -> None:
@@ -93,19 +93,19 @@ class TimerEngine(QObject):
             TimerState.SHORT_BREAK,
             TimerState.LONG_BREAK,
         }:
-            self.reset_to_idle("Break skipped")
+            self.reset_to_idle("已跳过休息")
 
     def snooze_break(self) -> None:
         if self._state != TimerState.BREAK_PROMPT:
             return
         self._start_state(TimerState.SNOOZE, 5 * 60)
         self.notification_requested.emit(
-            "Break snoozed", "Break reminder delayed by 5 minutes."
+            "提醒已延后", "休息提醒已延后 5 分钟。"
         )
 
     def dismiss_break_prompt(self) -> None:
         if self._state == TimerState.BREAK_PROMPT:
-            self.reset_to_idle("Break reminder dismissed")
+            self.reset_to_idle("已关闭提醒")
 
     def reset_to_idle(self, message: str | None = None) -> None:
         self._timer.stop()
@@ -117,7 +117,7 @@ class TimerEngine(QObject):
         self._pending_break_seconds = 0
         self._emit_all()
         if message:
-            self.notification_requested.emit(message, "Ready for the next focus session.")
+            self.notification_requested.emit(message, "等待开始下一轮专注。")
 
     def state_snapshot(self) -> StateSnapshot:
         active_state = self._state_before_pause if self._state == TimerState.PAUSED else self._state
@@ -181,9 +181,9 @@ class TimerEngine(QObject):
             self._target_end = datetime.now() + timedelta(seconds=break_seconds)
             self._timer.start()
             prompt_text = (
-                "Time to take a long break."
+                "该休息一下了"
                 if self._is_long_break_due()
-                else "Time to take a short break."
+                else "该休息一下了"
             )
             self._emit_all()
             self.break_prompt_requested.emit(prompt_text, break_seconds)
@@ -199,16 +199,16 @@ class TimerEngine(QObject):
             self._timer.start()
             self._emit_all()
             self.break_prompt_requested.emit(
-                "Break reminder resumed.", self._duration_seconds
+                "休息提醒已恢复", self._duration_seconds
             )
             return
 
         if completed_state == TimerState.BREAK_PROMPT:
-            self.reset_to_idle("Break finished")
+            self.reset_to_idle("休息结束")
             return
 
         if completed_state in {TimerState.SHORT_BREAK, TimerState.LONG_BREAK}:
-            self.reset_to_idle("Break finished")
+            self.reset_to_idle("休息结束")
 
     def _next_break_duration(self) -> int:
         if self._is_long_break_due():
@@ -237,13 +237,13 @@ class TimerEngine(QObject):
 
     def _status_text(self) -> str:
         mapping = {
-            TimerState.IDLE: "Ready",
-            TimerState.FOCUS: "Focus",
-            TimerState.SNOOZE: "Snoozed",
-            TimerState.SHORT_BREAK: "Short Break",
-            TimerState.LONG_BREAK: "Long Break",
-            TimerState.PAUSED: "Paused",
-            TimerState.BREAK_PROMPT: "Break Reminder",
+            TimerState.IDLE: "待开始",
+            TimerState.FOCUS: "专注中",
+            TimerState.SNOOZE: "已延后",
+            TimerState.SHORT_BREAK: "短休息",
+            TimerState.LONG_BREAK: "长休息",
+            TimerState.PAUSED: "已暂停",
+            TimerState.BREAK_PROMPT: "休息提醒",
         }
         return mapping[self._state]
 

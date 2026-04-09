@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import signal
 import sys
 
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
 
 from src.core.timer_engine import TimerEngine
 from src.system.autostart import AutoStartManager
 from src.system.config import AppConfig, ConfigManager
+from src.system.icons import app_icon
 from src.system.tray import TrayController
 from src.ui.floating_ball import FloatingBall
 from src.ui.fullscreen_break import FullscreenBreakController
@@ -16,8 +20,14 @@ from src.ui.main_window import MainWindow
 class FanqieApplication:
     def __init__(self) -> None:
         self.qt_app = QApplication(sys.argv)
-        self.qt_app.setApplicationName("Fanqie Clock")
+        self.qt_app.setApplicationName("番茄钟")
+        self.qt_app.setWindowIcon(app_icon())
         self.qt_app.setQuitOnLastWindowClosed(False)
+        self.qt_app.setFont(QFont("Microsoft YaHei", 10))
+        signal.signal(signal.SIGINT, self._handle_sigint)
+        self._signal_timer = QTimer()
+        self._signal_timer.timeout.connect(lambda: None)
+        self._signal_timer.start(250)
 
         self.config_manager = ConfigManager()
         self.config: AppConfig = self.config_manager.load()
@@ -108,6 +118,9 @@ class FanqieApplication:
 
     def run(self) -> int:
         return self.qt_app.exec()
+
+    def _handle_sigint(self, *_args) -> None:
+        self.qt_app.quit()
 
 
 def main() -> int:
