@@ -7,8 +7,8 @@ It focuses on a clean floating timer, a polished control window, and a strong fu
 
 Add screenshots here:
 
-![Main Window](docs/images/main-window.png)
-![Break Reminder](docs/images/break-reminder.png)
+![Main Window](imgs/主界面.jpg)
+![Break Reminder](imgs/休息.jpg)
 
 ## Features
 
