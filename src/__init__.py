@@ -1,0 +1,1 @@
+"""Fanqie Clock application package."""

@@ -15,7 +15,9 @@ Prefer small, focused modules. For example: `src/timer/`, `src/ui/`, `src/system
 
 ## Build, Test, and Development Commands
 
-No build system is committed yet. If the project follows the current Python desktop direction, standardize around:
+Use a project-local `venv` for all Python work. Do not install project dependencies into the system interpreter, base conda environment, or any shared global environment.
+
+Standardize around:
 
 - `python -m venv .venv` to create a virtual environment
 - `.venv\Scripts\activate` to activate it on Windows
@@ -23,7 +25,7 @@ No build system is committed yet. If the project follows the current Python desk
 - `python -m pytest` to run tests
 - `python -m src.main` to start the app locally
 
-Add new commands to this file when the toolchain is finalized.
+Before running the app, tests, formatting, or packaging, activate `.venv` first. If dependencies change, update `requirements.txt` in the same change.
 
 ## Coding Style & Naming Conventions
 
